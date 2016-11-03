@@ -10,6 +10,15 @@ defmodule Mongo.Ecto.GeoSearch.Migration do
     do_create_index(relation, atom_field, opts)
   end
 
+  def drop_2dsphere_index(relation, field, opts \\ %{})
+  def drop_2dsphere_index(relation, field, opts) when is_atom(field) do
+    do_drop_index(relation, field, opts)
+  end
+  def drop_2dsphere_index(relation, field, opts) do
+    atom_field = String.to_atom(field)
+    do_drop_index(relation, atom_field, opts)
+  end
+
   defp do_create_index(relation, field, opts) do
     execute [
       createIndexes: relation,
@@ -20,6 +29,13 @@ defmodule Mongo.Ecto.GeoSearch.Migration do
           "2dsphereIndexVersion": index_version(opts)
         ]
       ]
+    ]
+  end
+
+  defp do_drop_index(relation, field, opts) do
+    execute [
+      dropIndexes: relation,
+      index: name(field, opts)
     ]
   end
 
